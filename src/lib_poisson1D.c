@@ -83,7 +83,7 @@ void set_grid_points_1D(double *x, int *la)
 {
   for (int i = 0; i < *la; ++i)
   {
-    x[i] = i / (float)(*la - 1);
+    x[i] = (i + 1) / (float)(*la + 1);
   }
 }
 

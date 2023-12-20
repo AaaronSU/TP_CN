@@ -27,6 +27,10 @@ int main(int argc, char *argv[])
   NRHS = 1;
   nbpoints = 10;
   la = nbpoints - 2;
+  const int n = la;
+  const int *N = &n;
+  const int ldb = NRHS;
+  const int *LDB = &ldb;
   T0 = -5.0;
   T1 = 5.0;
 
@@ -51,7 +55,7 @@ int main(int argc, char *argv[])
 
   AB = (double *)malloc(sizeof(double) * lab * la);
 
-  set_GB_operator_colMajor_poisson1D_Id(AB, &lab, &la, &kv);
+  set_GB_operator_colMajor_poisson1D(AB, &lab, &la, &kv);
 
   write_GB_operator_colMajor_poisson1D(AB, &lab, &la, "AB.dat");
 
@@ -69,7 +73,8 @@ int main(int argc, char *argv[])
   /* Solution (Triangular) */
   if (info == 0)
   {
-    dgbtrs_("N", &la, &kl, &ku, &NRHS, AB, &lab, ipiv, RHS, &la, &info);
+    dgbtrs_("N", &la, &kl, &ku, &NRHS, AB, &lab, ipiv, RHS, &la, &info, (unsigned long)&la);
+    // Très bizarre la ligne dgbtrs mais bon... A revoir dans le futur.
     if (info != 0)
     {
       printf("\n INFO DGBTRS = %d\n", info);
@@ -81,6 +86,8 @@ int main(int argc, char *argv[])
   }
 
   /* It can also be solved with dgbsv */
+  dgbsv_(N, &kl, &ku, &NRHS, AB, &lab, ipiv, RHS, LDB, &info);
+  // Pas sur du tout pour le premier argument.
   // TODO : use dgbsv
 
   write_xy(RHS, X, &la, "SOL.dat");
