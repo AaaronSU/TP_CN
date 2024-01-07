@@ -104,7 +104,23 @@ int indexABCol(int i, int j, int *lab)
 
 int dgbtrftridiag(int *la, int *n, int *kl, int *ku, double *AB, int *lab, int *ipiv, int *info)
 {
-  // regarder photo
-  dgbtrf_(la, la, kl, ku, AB, lab, ipiv, info);
+  for (int ii = *lab - 1; ii < *lab * *la; ii++)
+  {
+    if (!(ii % *lab))
+    {
+      if (AB[ii - 2])
+      {
+        AB[ii - 1] = AB[ii + 1] / AB[ii - 2];
+      }
+      AB[ii + 2] = AB[ii + 2] - AB[ii - 1] * AB[ii + 1];
+    }
+  }
+
+  for (int ip = 0; ip < *la; ip++)
+  {
+    ipiv[ip] = ip + 1;
+  }
+  *info = 0;
+
   return 0;
 }

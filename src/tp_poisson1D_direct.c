@@ -83,6 +83,19 @@ int main(int argc, char *argv[])
     dgbtrftridiag(&la, &la, &kl, &ku, AB, &lab, ipiv, &info);
   }
 
+  for (int ii = 1; ii < lab * la + 1; ii++)
+  {
+    printf("%f ", AB[ii - 1]);
+    if (!(ii % lab))
+    {
+      printf("\n");
+    }
+  }
+  for (int ip = 0; ip < la; ip++)
+  {
+    printf("%d ", ipiv[ip]);
+  }
+
   if (IMPLEM == TRI || IMPLEM == TRF)
   {
     /* Solution (Triangular) */
