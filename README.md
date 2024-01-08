@@ -1,44 +1,3 @@
-##########################################################
-# README
-#
-# T. Dufaud
-##########################################################
-
-This directory contains the code corresponding to the solution
-of Poisson 1D problem by direct method or iterative method.
-It is organized in three directories:
-src/ 
-include/
-bin/
-
-"src" contains the source codes, "include" contains the 
-header files and "bin" contains the executables. 
-The compilation and execution can be done using the Makefile.
-
-Here are the principal targets: 
-testenv: bin/tp_testenv
-tp2poisson1D_direct: bin/tpPoisson1D_direct
-tp2poisson1D_iter: bin/tpPoisson1D_iter
-
-The command,
-$ make target
-Compile an executable bin/target 
-
-$ make all
-compile the executable corresponding to all targets
-
-$ make run_target
-Execute ./bin/target
-
-$ make clean
-rm *.o bin/*
-
-Here:
-$ make run_testenv
-$ make run_tpPoisson1D_iter
-$ make run_tpPoisson1D_direct
-
-
 # Rapport sur la résolution de l'équation de la chaleur en 1D stationnaire.
 
 
@@ -83,11 +42,48 @@ $$T(x+h) + T(x-h) \approx 2T(x) + h^2 \frac{d^2T}{dx^2}$$
 
 Ainsi, on dérive le résultat suivant :
 
-$$
-\begin{align*}
- \frac{d^2T}{dx^2} &\approx \frac{T(x+h) + T(x-h) - 2T(x)}{h^2} \\
-                   &\approx \frac{1}{h^2}[[T(x+h) - T(x)] - [T(x)-T(x-h)]]\\
-                   &\approx \frac{1}{h^2}[\Delta T(x, h) - \Delta T(x, -h)]\\
-                   &\approx \frac{1}{h^2}\Delta^2 T(x, h) 
+$$\frac{d^2T}{dx^2} \approx \frac{T(x+h) + T(x-h) - 2T(x)}{h^2} \approx \frac{1}{h^2}[[T(x+h) - T(x)] - [T(x)-T(x-h)]]\approx \frac{1}{h^2}\Delta^2 T(x, h)$$
 
-\end{align*}$$
+## Méthode directe et stockage bande
+
+En langage C, une matrice de taille `m x n` peut être représentée à l'aide d'un pointeur qui pointe vers l'entête d'une liste de taille `m x n x taille d'éléments`. La constante `lapack_col_major` est utilisée pour indiquer que la matrice est stockée en format colonne majeure, ce qui signifie que les éléments sont stockés côte à côte, avec une structure particulière pour représenter la bande (valeurs non nulles à proximité de la diagonale).
+
+La dimension principale dans le cadre de colonne majeure correspond au nombre de lignes, c'est-à-dire au nombre d'éléments sur une colonne. La fonction `dgbmv` est utilisée pour effectuer une multiplication entre une matrice bande et un vecteur. La fonction `dgbtrf` est employée pour la factorisation LU des matrices bandes, et `dgbtrs` résout un système linéaire `Ax = b` avec `A` sous forme de matrice bande en forme LU compacte.
+
+La fonction `dgbsv` combine les opérations de factorisation de `dgbtrf` et de résolution de système linéaire de `dgbtrs`. Elle factorise `A` et résout le système linéaire `Ax = b`.
+
+La formule de la norme du résidu relatif précédente était $\frac{||y - x||}{||x||}$. Pour calculer, on effectue la mise à jour de `y` en soustrayant `x` de `y` (`y = y - x`), puis on calcule la norme euclidienne de la nouvelle `y`. Ensuite, on calcule la norme euclidienne de `x`, et le résultat final est obtenu en divisant la norme de `y` mise à jour par la norme de `x`. On obtient ainsi la différence relative entre `x` et la mise à jour de `y`.
+
+## Stockage GB et appel à DGBMV
+
+Dans notre programme, nous avons mis en place une fonction intitulée `void set_GB_operator_colMajor_poisson1D(double *AB, int *lab, int *la, int *kv)` pour gérer le stockage de la matrice bande (GB). En utilisant cette fonction ainsi que les fonctions `dgbmv` et `double relative_forward_error(double *x, double *y, int *la)`, nous sommes en mesure de résoudre un système linéaire de la forme \(Ax = b\), pour lequel nous connaissons la solution à l'avance (la solution analytique de la partie 1). Nous calculons ensuite l'erreur relative, et si cette dernière est inférieure à un seuil prédéfini, nous considérons que le test est réussi, ce qui constitue notre critère de validation.
+
+## DGBTRF, DGBTRS, DGBSV
+
+
+
+## Contenu du Répertoire
+
+Ce répertoire contient le code correspondant à la solution du problème de Poisson 1D, que ce soit par méthode directe ou itérative. Il est structuré en trois répertoires :
+
+- **src** : Contient les codes sources.
+- **include** : Contient les fichiers d'en-tête.
+- **bin** : Contient les exécutables.
+
+La compilation et l'exécution peuvent être réalisées en utilisant le fichier Makefile.
+
+**Principales Cibles :**
+- `testenv` : bin/tp_testenv
+- `tp2poisson1D_direct` : bin/tpPoisson1D_direct
+- `tp2poisson1D_iter` : bin/tpPoisson1D_iter
+
+**Commandes :**
+- `$ make target` : Compile un exécutable bin/target.
+- `$ make all` : Compile les exécutables correspondant à toutes les cibles.
+- `$ make run_target` : Exécute ./bin/target.
+- `$ make clean` : Supprime les fichiers objets (*.o) et les exécutables dans le répertoire "bin".
+
+**Commandes Spécifiques :**
+- `$ make run_testenv`
+- `$ make run_tpPoisson1D_iter`
+- `$ make run_tpPoisson1D_direct`
