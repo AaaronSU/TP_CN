@@ -70,7 +70,14 @@ Ainsi, nous arrivons au système linéaire que nous devons résoudre, c'est-à-d
 
 la matrice $A$:
 
-$A = -\frac{k}{h^2} \begin{bmatrix} -2 & 1 & 0 & \cdots & 0 \\ 1 & -2 & 1 & \cdots & 0 \\ 0 & 1 & -2 & \ddots & 0 \\ \vdots & \vdots & \ddots & \ddots & 1 \\ 0 & 0 & \cdots & 1 & -2 \end{bmatrix}$
+$A = -\frac{k}{h^2} \begin{bmatrix}
+-2 & 1 & 0 & \cdots & 0 \\
+1 & -2 & 1 & \cdots & 0 \\
+0 & 1 & -2 & \ddots & 0 \\
+\vdots & \vdots & \ddots & \ddots & 1 \\
+0 & 0 & \cdots & 1 & -2
+\end{bmatrix}$
+
 
 le vecteur $x$:
 
