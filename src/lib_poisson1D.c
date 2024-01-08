@@ -81,9 +81,12 @@ void set_analytical_solution_DBC_1D(double *EX_SOL, double *X, int *la, double *
 
 void set_grid_points_1D(double *x, int *la)
 {
-  for (int i = 0; i < *la; ++i)
+  int jj;
+  double h;
+  h = 1.0 / (1.0 * ((*la) + 1));
+  for (jj = 0; jj < (*la); jj++)
   {
-    x[i] = (i + 1) / (float)(*la + 1);
+    x[jj] = (jj + 1) * h;
   }
 }
 
@@ -94,6 +97,8 @@ double relative_forward_error(double *x, double *y, int *la)
   double sum_haut = cblas_dnrm2(*la, y, 1);
 
   // En théorie, nous devons trouver 10e-16, en pratique, ceci n'est pas le cas. A voir.
+  // Déjà résolu, l'erreur venant de la fonction void set_grid_points_1D(double *x, int *la).
+  // La fonction donne des résultats précis mais de l'ordre de 10^-8
   return sum_haut / sum_bas;
 }
 
