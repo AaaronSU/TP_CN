@@ -50,6 +50,7 @@ Considérons maintenant $T(x_i)$ comme la température au point $x_i$ et $g_i$ c
 $$
 \forall i \in [0, n], \quad T(x_{i+1}) = T(x_i + h)
 $$
+
 ---
 $$\forall i \in [1, n+1], \quad T(x_{i-1}) = T(x_i - h)
 $$
@@ -69,23 +70,15 @@ Ainsi, nous arrivons au système linéaire que nous devons résoudre, c'est-à-d
 
 la matrice $A$:
 
-$
-A = -\frac{k}{h^2} \begin{bmatrix} -2 & 1 & 0 & \cdots & 0 \\ 1 & -2 & 1 & \cdots & 0 \\ 0 & 1 & -2 & \ddots & 0 \\ \vdots & \vdots & \ddots & \ddots & 1 \\ 0 & 0 & \cdots & 1 & -2 \end{bmatrix}
-$
+$A = -\frac{k}{h^2} \begin{bmatrix} -2 & 1 & 0 & \cdots & 0 \\ 1 & -2 & 1 & \cdots & 0 \\ 0 & 1 & -2 & \ddots & 0 \\ \vdots & \vdots & \ddots & \ddots & 1 \\ 0 & 0 & \cdots & 1 & -2 \end{bmatrix}$
 
 le vecteur $x$:
 
-$
-u = \begin{bmatrix} T(x_1) \\ T(x_2) \\ T(x_3)\\\vdots \\T(x_{n-2})\\ T(x_{n-1}) \\ T(x_{n}) \end{bmatrix}
-$
+$u = \begin{bmatrix} T(x_1) \\ T(x_2) \\ T(x_3)\\\vdots \\T(x_{n-2})\\ T(x_{n-1}) \\ T(x_{n}) \end{bmatrix}$
 
 et le vecteur $f$:
 
-$
-f = \begin{bmatrix} g_0 + \frac{k}{h^2}T_0 \\ g_2 \\g_3\\ \vdots\\ g_{n-2} \\ g_{n-1} \\ g_n + \frac{k}{h^2}T_1 \end{bmatrix}
-$
-
-
+$f = \begin{bmatrix} g_0 + \frac{k}{h^2}T_0 \\ g_2 \\g_3\\ \vdots\\ g_{n-2} \\ g_{n-1} \\ g_n + \frac{k}{h^2}T_1 \end{bmatrix}$
 
 ## Méthode directe et stockage bande
 
