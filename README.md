@@ -44,6 +44,49 @@ Ainsi, on dérive le résultat suivant :
 
 $$\frac{d^2T}{dx^2} \approx \frac{T(x+h) + T(x-h) - 2T(x)}{h^2} \approx \frac{1}{h^2}[[T(x+h) - T(x)] - [T(x)-T(x-h)]]\approx \frac{1}{h^2}\Delta^2 T(x, h)$$
 
+Considérons maintenant $T(x_i)$ comme la température au point $x_i$ et $g_i$ comme le terme source associé au point $x_i$, où $h$ représente le pas de discrétisation. Ceci se formule comme suit :
+
+---
+$$
+\forall i \in [0, n], \quad T(x_{i+1}) = T(x_i + h)
+$$
+---
+$$\forall i \in [1, n+1], \quad T(x_{i-1}) = T(x_i - h)
+$$
+---
+
+Pour $i \in [1, n]$, nous avons ainsi:
+
+$$
+-k\frac{d^2T}{d(x_i)^2} = g_i
+$$
+
+$$
+g_i = -\frac{k}{h^2}[T(x_{i+1}) -2 T(x_i) + T(x_{i-1})]
+$$
+
+Ainsi, nous arrivons au système linéaire que nous devons résoudre, c'est-à-dire $Au=f$, avec :
+
+la matrice $A$:
+
+$
+A = -\frac{k}{h^2} \begin{bmatrix} -2 & 1 & 0 & \cdots & 0 \\ 1 & -2 & 1 & \cdots & 0 \\ 0 & 1 & -2 & \ddots & 0 \\ \vdots & \vdots & \ddots & \ddots & 1 \\ 0 & 0 & \cdots & 1 & -2 \end{bmatrix}
+$
+
+le vecteur $x$:
+
+$
+u = \begin{bmatrix} T(x_1) \\ T(x_2) \\ T(x_3)\\\vdots \\T(x_{n-2})\\ T(x_{n-1}) \\ T(x_{n}) \end{bmatrix}
+$
+
+et le vecteur $f$:
+
+$
+f = \begin{bmatrix} g_0 + \frac{k}{h^2}T_0 \\ g_2 \\g_3\\ \vdots\\ g_{n-2} \\ g_{n-1} \\ g_n + \frac{k}{h^2}T_1 \end{bmatrix}
+$
+
+
+
 ## Méthode directe et stockage bande
 
 En langage C, une matrice de taille `m x n` peut être représentée à l'aide d'un pointeur qui pointe vers l'entête d'une liste de taille `m x n x taille d'éléments`. La constante `lapack_col_major` est utilisée pour indiquer que la matrice est stockée en format colonne majeure, ce qui signifie que les éléments sont stockés côte à côte, avec une structure particulière pour représenter la bande (valeurs non nulles à proximité de la diagonale).
@@ -60,6 +103,14 @@ Dans notre programme, nous avons mis en place une fonction intitulée `void set_
 
 ## DGBTRF, DGBTRS, DGBSV
 
+La performance de la fonction dgbtrf est caractérisée par une complexité de $O(n^3)$, indiquant une croissance cubique de la consommation de ressources en fonction de la taille $n$ du problème. Pour dgbtrs, sa performance est évaluée avec une complexité de $O(n^2)$, signifiant une croissance quadratique. La fonction dgbsv, étant une fusion des opérations de dgbtrf et dgbtrs, affiche une complexité de $O(n^3)$, résultant de la combinaison des contributions cubiques de ces deux opérations distinctes.
+
+## Méthode de résolution itérative
+
+Dans le contexte de la méthode itérative, nous avons extrait la diagonale pour Jacobi (où \(M = D\)), la partie D-E pour Gauss-Seidel, et ensuite appliqué la décomposition LU sur \(M\) en utilisant la fonction `dgbtrf`. À chaque itération, nous résolvons le système linéaire \(Mx = b\) en utilisant la fonction `dgbtrs`, où \(M\) est la matrice bande qui stocke la décomposition LU de manière compacte. Ces étapes ont conduit à l'obtention des courbes de convergence respectives pour les trois méthodes. Il est pertinent de noter que les méthodes de Jacobi et Richardson Alpha présentent des comportements de convergence très similaires.
+
+
+![Courbe de la convergence des différents méthodes](Ref_courbe_convergence.png)
 
 
 ## Contenu du Répertoire

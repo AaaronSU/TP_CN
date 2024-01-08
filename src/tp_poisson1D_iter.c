@@ -71,6 +71,7 @@ int main(int argc, char *argv[])
   lab = kv + kl + ku + 1;
 
   AB = (double *)malloc(sizeof(double) * lab * la);
+  ipiv = malloc(la * sizeof(int));
   set_GB_operator_colMajor_poisson1D(AB, &lab, &la, &kv);
 
   /* uncomment the following to check matrix A */
@@ -95,6 +96,7 @@ int main(int argc, char *argv[])
   {
     richardson_alpha(AB, RHS, SOL, &opt_alpha, &lab, &la, &ku, &kl, &tol, &maxit, resvec, &nbite);
     printf("Optimal alpha for simple Richardson iteration is : %lf", opt_alpha);
+    write_vec(resvec, &nbite, "RESVEC_alpha.dat");
   }
 
   /* Richardson General Tridiag */
@@ -117,14 +119,19 @@ int main(int argc, char *argv[])
   if (IMPLEM == JAC || IMPLEM == GS)
   {
     write_GB_operator_colMajor_poisson1D(MB, &lab, &la, "MB.dat");
-    richardson_MB(AB, RHS, SOL, MB, &lab, &la, &ku, &kl, &tol, &maxit, resvec, &nbite);
+    richardson_MB(AB, RHS, SOL, MB, &lab, &la, &ku, &kl, &tol, &maxit, resvec, &nbite, &NRHS, ipiv, &info);
+  }
+  if (IMPLEM == JAC)
+  {
+    write_vec(resvec, &nbite, "RESVEC_jacobi.dat");
+  }
+  else if (IMPLEM == GS)
+  {
+    write_vec(resvec, &nbite, "RESVEC_GS.dat");
   }
 
   /* Write solution */
   write_vec(SOL, &la, "SOL.dat");
-
-  /* Write convergence history */
-  write_vec(resvec, &nbite, "RESVEC.dat");
 
   free(resvec);
   free(RHS);

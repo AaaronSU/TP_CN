@@ -4,6 +4,7 @@
 /* to solve the Poisson 1D problem        */
 /******************************************/
 #include "lib_poisson1D.h"
+#include "time.h"
 
 #define TRF 0
 #define TRI 1
@@ -13,6 +14,8 @@ int main(int argc, char *argv[])
 /* ** argc: Nombre d'arguments */
 /* ** argv: Valeur des arguments */
 {
+  struct timespec start, end;
+  double elapsed_time;
   int ierr;
   int jj;
   int nbpoints, la;
@@ -74,7 +77,11 @@ int main(int argc, char *argv[])
   /* LU Factorization */
   if (IMPLEM == TRF)
   {
+    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
     dgbtrf_(&la, &la, &kl, &ku, AB, &lab, ipiv, &info);
+    clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+    elapsed_time = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
+    printf("Temps d'exécution pour la méthode DGBTRF est de : %f secondes\n", elapsed_time);
   }
 
   /* LU for tridiagonal matrix  (can replace dgbtrf_) */
@@ -101,7 +108,12 @@ int main(int argc, char *argv[])
     /* Solution (Triangular) */
     if (info == 0)
     {
+      clock_gettime(CLOCK_MONOTONIC_RAW, &start);
       dgbtrs_("N", &la, &kl, &ku, &NRHS, AB, &lab, ipiv, RHS, &la, &info, (unsigned long)&la);
+      clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+      elapsed_time = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
+      printf("Temps d'exécution pour la méthode DGBTRS est de : %f secondes\n", elapsed_time);
+
       if (info != 0)
       {
         printf("\n INFO DGBTRS = %d\n", info);
@@ -116,7 +128,11 @@ int main(int argc, char *argv[])
   /* It can also be solved with dgbsv */
   if (IMPLEM == SV)
   {
+    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
     dgbsv_(&la, &kl, &ku, &NRHS, AB, &lab, ipiv, RHS, &la, &info);
+    clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+    elapsed_time = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
+    printf("Temps d'exécution pour la méthode DGBSV est de : %f secondes\n", elapsed_time);
   }
 
   write_GB_operator_colMajor_poisson1D(AB, &lab, &la, "LU.dat");
